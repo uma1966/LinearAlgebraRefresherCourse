@@ -83,4 +83,19 @@ print(v_parallel)
 print(v_orthogonal)
 print(v_parallel.add(v_orthogonal) == v125)
 
-print(v125.projection_orthogonal(Vector.zero(v125.dimension)))
+#print(v125.projection_orthogonal(Vector.zero(v125.dimension)))
+
+print('###########################################')
+print('cross product')
+
+v141 = Vector(('8.462', '7.893', '-8.187'))
+v142 = Vector(('6.984', '-5.975', '4.778'))
+print(v141.cross_product(v142))
+
+v143 = Vector(('-8.987', '-9.838', '5.031'))
+v144 = Vector(('-4.268', '-1.861', '-8.866'))
+print(v143.area_of_parallelogram(v144))
+
+v145 = Vector(('1.5', '9.547', '3.691'))
+v146 = Vector(('-6.007', '0.124', '5.772'))
+print(v143.area_of_triangle(v146))

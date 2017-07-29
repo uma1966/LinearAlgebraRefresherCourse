@@ -100,6 +100,7 @@ class Vector(object):
                self.angle_with(other) == math.pi
 
     def projection_parallel(self, base):
+        "Projektion von self auf base"
         try:
             b_norm = base.normalized()
             v_mag = self.dot_product(b_norm)
@@ -108,8 +109,34 @@ class Vector(object):
             raise NoUniqueParallelComponent()
 
     def projection_orthogonal(self, base):
+        "Ortogonale zur Projektion von self auf base"
         try:
             projection = self.projection_parallel(base)
             return self.sub(projection)
         except NormalizeZeroVectorException:
             raise NoUniqueOrthogonalComponent()
+
+    def cross_product(self, other):
+        "Kreuzprodukt"
+        if self.dimension != other.dimension:
+            raise ValueError('vectors must have same dimension for building cross product')
+        v = Vector(self.coordinates)
+        w = Vector(other.coordinates)
+        if v.dimension < 3:
+            v.coordinates.extend([0 for _ in range(3-v.dimension)])
+            w.coordinates.extend([0 for _ in range(3-w.dimension)])
+        if v.dimension != 3 or w.dimension != 3:
+            raise ValueError('cross product defined for 1-3 dimensions only')
+        r1 = v[1]*w[2] - v[2]*w[1]
+        r2 = -(v[0]*w[2] - v[2]*w[0])
+        r3 = v[0]*w[1] - v[1]*w[0]
+        return Vector((r1, r2, r3))
+
+    def area_of_parallelogram(self, other):
+        # Alternatively:
+        # height = other.projection_orthogonal(self).magnitude()
+        # return self.magnitude() * height
+        return self.cross_product(other).magnitude()
+
+    def area_of_triangle(self, other):
+        return self.area_of_parallelogram(other) / Decimal('2.0')
