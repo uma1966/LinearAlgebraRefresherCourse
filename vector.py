@@ -61,7 +61,9 @@ class Vector(object):
         return result
 
     def angle_with(self, other, in_degrees=False):
-        angle = math.acos(self.dot_product(other) / (self.magnitude() * other.magnitude()))
+        angle = self.magnitude() * other.magnitude()
+        angle = self.dot_product(other) / angle
+        angle = math.acos(round(angle, 10)) # without rounding there might be numerical issues...
         if in_degrees:
             return 180. / math.pi * angle
         else:

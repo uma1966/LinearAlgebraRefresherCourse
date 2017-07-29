@@ -1,10 +1,6 @@
 from vector import *
 
-
-
-
-##########################################
-# Add, Subtract, scalar multiply
+print('###########################################')
 print('Add, Subtract, scalar multiply')
 # (1)
 v1 = Vector([8.218,-9.341])
@@ -22,9 +18,7 @@ print(v3.sub(v4))
 v4 = Vector((1.671,-1.012,-0.318))
 print(v4.scalar_product(7.41))
 
-###########################################
-# magnitude & direction
-
+print('###########################################')
 print('magnitude & direction')
 v5 = Vector((-0.221,7.437))
 print(v5.magnitude())
@@ -41,8 +35,7 @@ print(Vector((1.996,3.108,-4.554)).normalized())
 #print(str(v61) + ' -norm-> ' + str(v61.normalized()))
 #print(str(v62) + ' -norm-> ' + str(v62.normalized()))
 
-###########################################
-# dot product & angle
+print('###########################################')
 print('dot product & angle')
 print(Vector((7.887,4.138)).dot_product(Vector((-8.802, 6.776))))
 
@@ -52,11 +45,10 @@ print(Vector((3.183,-7.627)).angle_with(Vector((-2.668, 5.319))))
 
 print(Vector((7.35,0.221,5.188)).angle_with(Vector((2.751,8.259,3.985)),True))
 
-###########################################
-# parallel & orthogonal
+print('###########################################')
 print('parallel & orthogonal')
 
-v71 = Vector(('-7.597','-7.88'))
+v71 = Vector(('-7.579','-7.88'))
 v72 = Vector(('22.737','23.64'))
 print(v71.is_parallel_to(v72), v71.is_orthogonal_to(v72))
 
