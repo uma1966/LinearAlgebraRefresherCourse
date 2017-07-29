@@ -3,7 +3,25 @@ from decimal import Decimal, getcontext
 
 getcontext().prec = 30
 
+class VectorException(Exception):
+    pass
+
+class NormalizeZeroVectorException(VectorException):
+    pass
+
+class NoUniqueParallelComponent(NormalizeZeroVectorException):
+    pass
+
+class NoUniqueOrthogonalComponent(NormalizeZeroVectorException):
+    pass
+
 class Vector(object):
+
+    @classmethod
+    def zero(cls, dimension):
+        "returns a zero vector of given dimension"
+        return Vector([0 for x in range(dimension)])
+
     def __init__(self, coordinates):
         try:
             if not coordinates:
@@ -26,7 +44,7 @@ class Vector(object):
     def __getitem__(self, i):
         return self.coordinates[i]
 
-    def add(self,other):
+    def add(self, other):
         if self.dimension != other.dimension:
             raise ValueError('Dimensions do not match (' + str(self.dimension) + ' != ' + str(other.dimension) + ')')
         result = [x+y for x,y in zip(self.coordinates, other.coordinates)]
@@ -53,7 +71,7 @@ class Vector(object):
         try:
             return self.scalar_product(Decimal('1.0') / self.magnitude())
         except ZeroDivisionError:
-            raise ZeroDivisionError('Cannot normalize the zero vector')
+            raise NormalizeZeroVectorException('Cannot normalize the zero vector')
 
     def dot_product(self, other):
         """Skalarprodukt"""
@@ -80,3 +98,18 @@ class Vector(object):
                other.is_zero() or \
                self.angle_with(other) == 0 or \
                self.angle_with(other) == math.pi
+
+    def projection_parallel(self, base):
+        try:
+            b_norm = base.normalized()
+            v_mag = self.dot_product(b_norm)
+            return base.normalized().scalar_product(v_mag)
+        except NormalizeZeroVectorException:
+            raise NoUniqueParallelComponent()
+
+    def projection_orthogonal(self, base):
+        try:
+            projection = self.projection_parallel(base)
+            return self.sub(projection)
+        except NormalizeZeroVectorException:
+            raise NoUniqueOrthogonalComponent()
