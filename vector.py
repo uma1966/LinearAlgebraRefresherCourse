@@ -3,17 +3,22 @@ from decimal import Decimal, getcontext
 
 getcontext().prec = 30
 
+
 class VectorException(Exception):
     pass
+
 
 class NormalizeZeroVectorException(VectorException):
     pass
 
+
 class NoUniqueParallelComponent(NormalizeZeroVectorException):
     pass
 
+
 class NoUniqueOrthogonalComponent(NormalizeZeroVectorException):
     pass
+
 
 class Vector(object):
 
@@ -123,6 +128,7 @@ class Vector(object):
         v = Vector(self.coordinates)
         w = Vector(other.coordinates)
         if v.dimension < 3:
+            # Extend dimension to 3 assuming 0
             v.coordinates.extend([0 for _ in range(3-v.dimension)])
             w.coordinates.extend([0 for _ in range(3-w.dimension)])
         if v.dimension != 3 or w.dimension != 3:
