@@ -98,7 +98,8 @@ class Line(object):
 
     def parallel_to(self, other):
         # lines are parellel if their normal vectors are parallel
-        return self.normal_vector.is_parallel_to(other.normal_vector)
+        result = self.normal_vector.is_parallel_to(other.normal_vector)
+        return result
 
     def equal_to(self, other):
         if not self.parallel_to(other):
@@ -107,16 +108,16 @@ class Line(object):
         # Check if vector between one point on each line is orthogonal to the lines normal vectors
         # connect the basepoints
         connecting_vector = self.basepoint.sub(other.basepoint)
-        # now check orthogonality to normmal vector
+        # now check orthogonality to normal vector
         if not connecting_vector.is_orthogonal_to(self.normal_vector):
             return False
-        return False
+        return True
 
     def intersection(self, other):
         if self.parallel_to(other):
             if self.equal_to(other):
                 # equal lines have an indefinite number of intersections
-                raise Exception("equal lines")
+                return "INDEFINITE"
             else:
                 # parallel lines have no intersection
                 return None
@@ -129,7 +130,6 @@ class Line(object):
         x = (D*k1-B*k2)/(A*D-B*C)
         y = (-C*k1+A*k2)/(A*D-B*C)
         return Vector((x,y))
-
 
 
 class MyDecimal(Decimal):

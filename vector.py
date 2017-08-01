@@ -69,7 +69,8 @@ class Vector(object):
 
     def magnitude(self):
         """Betrag"""
-        return Decimal(math.sqrt(sum([x**2 for x in self.coordinates])))
+        result = math.sqrt(sum([x**2 for x in self.coordinates]))
+        return Decimal(result)
 
     def normalized(self):
         """Normalenvektor"""
@@ -96,13 +97,14 @@ class Vector(object):
         return self.magnitude() < tolerance
 
     def is_orthogonal_to(self,other, tolerance=1e-10):
-        return abs(self.dot_product(other)) < tolerance
+        dot = self.dot_product(other)
+        return abs(dot) < tolerance
 
     def is_parallel_to(self,other):
-        return self.is_zero() or \
-               other.is_zero() or \
-               self.angle_with(other) == 0 or \
-               self.angle_with(other) == math.pi
+        is_zero = self.is_zero()
+        other_zero = other.is_zero()
+        angle = self.angle_with(other)
+        return is_zero or other_zero or angle == 0 or angle == math.pi
 
     def projection_parallel(self, base):
         "Projektion von self auf base"
