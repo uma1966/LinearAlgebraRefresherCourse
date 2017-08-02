@@ -106,14 +106,19 @@ class Line(object):
             # non parallel lines can't be equal
             return False
         # Check if vector between one point on each line is orthogonal to the lines normal vectors
-        # connect the basepoints
+        # First connect the basepoints:
         connecting_vector = self.basepoint.sub(other.basepoint)
-        # now check orthogonality to normal vector
-        if not connecting_vector.is_orthogonal_to(self.normal_vector):
+        # Then check orthogonality to normal vector (as the lines
+        # are parallel it is sufficient to check with just one normal vector):
+        if connecting_vector.is_orthogonal_to(self.normal_vector):
+            return True
+        else:
             return False
-        return True
 
     def intersection(self, other):
+        """Intersection for 2 dimensions"""
+        if self.dimension != 2:
+            raise Exception("intersection implemented for 2 dimensions only")
         if self.parallel_to(other):
             if self.equal_to(other):
                 # equal lines have an indefinite number of intersections
@@ -121,8 +126,11 @@ class Line(object):
             else:
                 # parallel lines have no intersection
                 return None
-        # else calculate x,y for equation system
-        #   A*x + B*y = k1, C*x + D*y = k2
+        # else calculate x,y for equation system, assuming
+        # A and B are not 0 at the same time (this is the case because
+        # they are not parallel). Equation system is:
+        #  A*x + B*y = k1
+        #  C*x + D*y = k2
         A,B = self.normal_vector.coordinates
         k1 = self.constant_term
         C,D = other.normal_vector.coordinates
