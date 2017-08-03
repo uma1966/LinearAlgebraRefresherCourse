@@ -102,6 +102,19 @@ class Line(object):
         return result
 
     def equal_to(self, other):
+
+        # Check special case normal vector is the zero vector:
+        if self.normal_vector.is_zero():
+            if not other.normal_vector.is_zero():
+                return False
+            else:
+                # coefficients of equation are zero --> lines are
+                # equal if constant terms are equal
+                diff = self.constant_term - other.constant_term
+                return MyDecimal(diff).is_near_zero()
+        elif other.normal_vector.is_zero():
+            return False
+
         if not self.parallel_to(other):
             # non parallel lines can't be equal
             return False
@@ -110,10 +123,10 @@ class Line(object):
         connecting_vector = self.basepoint.sub(other.basepoint)
         # Then check orthogonality to normal vector (as the lines
         # are parallel it is sufficient to check with just one normal vector):
-        if connecting_vector.is_orthogonal_to(self.normal_vector):
-            return True
-        else:
-            return False
+        return connecting_vector.is_orthogonal_to(self.normal_vector)
+
+    def __eq__(self, other):
+        return self.equal_to(other)
 
     def intersection(self, other):
         """Intersection for 2 dimensions"""
@@ -121,8 +134,9 @@ class Line(object):
             raise Exception("intersection implemented for 2 dimensions only")
         if self.parallel_to(other):
             if self.equal_to(other):
-                # equal lines have an indefinite number of intersections
-                return "INDEFINITE"
+                # equal lines have an indefinite number of intersections,
+                # so we return the line itself:
+                return self
             else:
                 # parallel lines have no intersection
                 return None
