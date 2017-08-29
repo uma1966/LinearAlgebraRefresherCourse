@@ -63,9 +63,13 @@ class LinearSystem(object):
 
         return indices
 
-    def clear_terms_below(self, column, row):
+    def clear_coefficients_below(self, column, row):
+        """
+        Sets coefficients in column to zero in all equations blow the one
+        in row.
+        """
         for i in range(row+1, len(self)):
-            c = -(self[i].normal_vector[column] / self[row].normal_vector[column])
+            c = -(MyDecimal(self[i].normal_vector[column]) / MyDecimal(self[row].normal_vector[column]))
             self.add_multiple_times_row_to_row(c, row, i)
 
     def find_nonzero_coefficient_below(self, column, row):
@@ -80,20 +84,20 @@ class LinearSystem(object):
 
     def compute_triangular_form(self):
         system = deepcopy(self)
-        m = len(system)
-        n = system.dimension
+        #num_equations = len(system)
+        num_variables = system.dimension
         j = 0
         for i, plane in enumerate(system.planes):
-            while j < n:
-                c = plane.normal_vector[j]
-                if c == 0:
+            while j < num_variables:
+                c = MyDecimal(plane.normal_vector[j])
+                if c.is_near_zero():
                     i_nonzero = system.find_nonzero_coefficient_below(j, i)
                     if i_nonzero is not None:
                         system.swap_rows(i, i_nonzero)
                     else:
                         j += 1
                         continue
-                system.clear_terms_below(j, i)
+                system.clear_coefficients_below(j, i)
                 j += 1
                 break
         print('triangular form:')
