@@ -30,19 +30,19 @@ class LinearSystem(object):
             raise Exception(self.ALL_PLANES_MUST_BE_IN_SAME_DIM_MSG)
 
     def swap_rows(self, row1, row2):
-        self.planes[row1], self.planes[row2] = self.planes[row2], self.planes[row1]
+        self[row1], self[row2] = self[row2], self[row1]
 
     def multiply_coefficient_and_row(self, coefficient, row):
-        plane = self.planes[row]
+        plane = self[row]
         new_normal_vector = plane.normal_vector.scalar_product(coefficient)
         new_constant_term = plane.constant_term * coefficient
-        self.planes[row] = Plane(new_normal_vector, new_constant_term)
+        self[row] = Plane(new_normal_vector, new_constant_term)
 
     def add_multiple_times_row_to_row(self, coefficient, row_to_add, row_to_be_added_to):
-        plane = self.planes[row_to_add]
+        plane = self[row_to_add]
         plane_to_add = Plane(plane.normal_vector.scalar_product(coefficient), plane.constant_term*coefficient)
-        plane = self.planes[row_to_be_added_to]
-        self.planes[row_to_be_added_to] = Plane(
+        plane = self[row_to_be_added_to]
+        self[row_to_be_added_to] = Plane(
             plane.normal_vector.add(plane_to_add.normal_vector),
             plane.constant_term + plane_to_add.constant_term)
 
@@ -62,6 +62,43 @@ class LinearSystem(object):
                     raise e
 
         return indices
+
+    def clear_terms_below(self, column, row):
+        for i in range(row+1, len(self)):
+            c = -(self[i].normal_vector[column] / self[row].normal_vector[column])
+            self.add_multiple_times_row_to_row(c, row, i)
+
+    def find_nonzero_coefficient_below(self, column, row):
+        """
+        Returns index of row with first nonzero coefficient in given column,
+        starting in given row. Returns None if no nonzero coefficient was found.
+        """
+        for i in range(row+1, len(self)):
+            if self[i].normal_vector[column] != 0:
+                return i
+        return None
+
+    def compute_triangular_form(self):
+        system = deepcopy(self)
+        m = len(system)
+        n = system.dimension
+        j = 0
+        for i, plane in enumerate(system.planes):
+            while j < n:
+                c = plane.normal_vector[j]
+                if c == 0:
+                    i_nonzero = system.find_nonzero_coefficient_below(j, i)
+                    if i_nonzero is not None:
+                        system.swap_rows(i, i_nonzero)
+                    else:
+                        j += 1
+                        continue
+                system.clear_terms_below(j, i)
+                j += 1
+                break
+        print('triangular form:')
+        print(system)
+        return system
 
     def __len__(self):
         return len(self.planes)
