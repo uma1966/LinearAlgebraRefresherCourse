@@ -100,9 +100,37 @@ class LinearSystem(object):
                 system.clear_coefficients_below(j, i)
                 j += 1
                 break
-        print('triangular form:')
-        print(system)
+        # print('triangular form:')
+        # print(system)
         return system
+
+    def clear_coefficients_above(self, column, row):
+        """
+        Sets coefficients in column to zero in all equations above the one
+        in row.
+        """
+        for i in range(row-1, -1 ,-1):
+            c = -(MyDecimal(self[i].normal_vector[column]) / MyDecimal(self[row].normal_vector[column]))
+            self.add_multiple_times_row_to_row(c, row, i)
+
+    def compute_rref(self):
+        tf = self.compute_triangular_form()
+
+        pivot_indices = tf.indices_of_first_nonzero_terms_in_each_row()
+
+        for row in range(len(tf)-1,-1,-1):
+            # Set col to first nonzero coefficient in row:
+            col = pivot_indices[row]
+            # go to next row if there is no nonzero coefficient:
+            if col < 0:
+                continue
+            # Scale row to make coefficient of variable in col be 1:
+            factor = MyDecimal(1 / tf[row].normal_vector[col])
+            tf.multiply_coefficient_and_row(factor, row)
+            # Clear all terms with variable in col in rows above row:
+            tf.clear_coefficients_above(col, row)
+
+        return tf
 
     def __len__(self):
         return len(self.planes)
