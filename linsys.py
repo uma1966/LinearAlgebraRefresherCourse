@@ -110,7 +110,7 @@ class LinearSystem(object):
         in row.
         """
         for i in range(row-1, -1 ,-1):
-            c = -(MyDecimal(self[i].normal_vector[column]) / MyDecimal(self[row].normal_vector[column]))
+            c = -self[i].normal_vector[column]
             self.add_multiple_times_row_to_row(c, row, i)
 
     def compute_rref(self):
@@ -125,7 +125,7 @@ class LinearSystem(object):
             if col < 0:
                 continue
             # Scale row to make coefficient of variable in col be 1:
-            factor = MyDecimal(1 / tf[row].normal_vector[col])
+            factor = Decimal('1.0') / tf[row].normal_vector[col]
             tf.multiply_coefficient_and_row(factor, row)
             # Clear all terms with variable in col in rows above row:
             tf.clear_coefficients_above(col, row)
