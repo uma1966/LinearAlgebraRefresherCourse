@@ -114,6 +114,10 @@ class LinearSystem(object):
             self.add_multiple_times_row_to_row(c, row, i)
 
     def compute_rref(self):
+        """
+        Computes the reduced row echelon form of the equation system and
+        returns this as a new system.
+        """
         tf = self.compute_triangular_form()
 
         pivot_indices = tf.indices_of_first_nonzero_terms_in_each_row()
@@ -131,6 +135,31 @@ class LinearSystem(object):
             tf.clear_coefficients_above(col, row)
 
         return tf
+
+    def solve(self):
+        rref = self.compute_rref()
+        print(rref)
+        # 1. System is inconsistent if one row is 0 = k for k <> 0
+        for plane in rref.planes:
+            try:
+                Plane.first_nonzero_index(plane.normal_vector)
+            except Exception as ex:
+                if str(ex) == Plane.NO_NONZERO_ELTS_FOUND_MSG:
+                    k = MyDecimal(plane.constant_term)
+                    if not k.is_near_zero():
+                        # row is 0 = k for k <> 0, so no solution
+                        return None
+                else:
+                    raise ex
+        # 2. Indefinite number of solutions, if number of free variables (pivots) < dimension of solution set
+        pivot_indices = rref.indices_of_first_nonzero_terms_in_each_row()
+        num_pivots = sum([1 if index >= 0 else 0 for index in pivot_indices])
+        if num_pivots < rref.dimension:
+            return "Indefinite number of solutions (dimension: {})".format(num_pivots)
+
+        # 3. Consistent set has unique solution <=> each variable is a pivot variable
+        solution_coords = [rref.planes[row].constant_term for row in range(rref.dimension)]
+        return Vector(solution_coords)
 
     def __len__(self):
         return len(self.planes)
