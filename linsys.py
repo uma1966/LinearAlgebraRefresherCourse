@@ -137,8 +137,15 @@ class LinearSystem(object):
         return tf
 
     def solve(self):
+        """
+        Solve the linear quation system.
+        :return: None if there is no solution, a Vector object if there is exactly one solution,
+                 a Parametrization if there are indefinitely many solutions.
+        """
+        # Compute the solution in form of rref:
         rref = self.compute_rref()
         print(rref)
+
         # 1. System is inconsistent if one row is 0 = k for k <> 0
         for plane in rref.planes:
             try:
@@ -151,11 +158,45 @@ class LinearSystem(object):
                         return None
                 else:
                     raise ex
-        # 2. Indefinite number of solutions, if number of free variables (pivots) < dimension of solution set
+
+        # 2. Indefinite number of solutions, if number of pivot variables < dimension of solution set
         pivot_indices = rref.indices_of_first_nonzero_terms_in_each_row()
         num_pivots = sum([1 if index >= 0 else 0 for index in pivot_indices])
         if num_pivots < rref.dimension:
-            return "Indefinite number of solutions (dimension: {})".format(num_pivots)
+            # Yes, indefinite number of solutions.
+            #
+            # First: Calculate the direction vectors of parametrized solution:
+            #
+            direction_vectors = []
+            # Calculate indices of free variables (those who are not pivot variables):
+            free_var_indices = set(range(rref.dimension)) - set(pivot_indices)
+            # for every free variable calulate a direction vector:
+            for free_var_index in free_var_indices:
+                # build an empty direction vector
+                dir_vector_coords = [0] * rref.dimension
+                # set coordinate of free variable to 1
+                dir_vector_coords[free_var_index] = 1
+                # set coordinates of pivot variables:
+                for i, plane in enumerate(rref.planes):
+                    if pivot_indices[i] < 0:
+                        # this one is not a pivot variable -> goto next
+                        break
+                    # calculate direction vector coordinate for this variable:
+                    dir_vector_coords[pivot_indices[i]] = -plane.normal_vector[free_var_index]
+                # Add direction vector to :
+                direction_vectors.append(Vector(dir_vector_coords))
+
+            #
+            # Second: Calculate the base point of parametrized solution
+            #
+            base_point_coords = [0] * rref.dimension
+            for i, plane in enumerate(rref.planes):
+                if pivot_indices[i] < 0:
+                    break;
+                base_point_coords[pivot_indices[i]] = plane.constant_term
+            base_point = Vector(base_point_coords)
+
+            return Parametrization(base_point,direction_vectors)
 
         # 3. Consistent set has unique solution <=> each variable is a pivot variable
         solution_coords = [rref.planes[row].constant_term for row in range(rref.dimension)]
@@ -180,6 +221,43 @@ class LinearSystem(object):
         temp = ['Equation {}: {}'.format(i+1,p) for i,p in enumerate(self.planes)]
         ret += '\n'.join(temp)
         return ret
+
+
+class Parametrization(object):
+    """
+    Not found in original course resources... (see course forums).
+    Source of this implementation:
+    https://github.com/omarrayward/Linear-Algebra-Refresher-Udacity/blob/master/linear_system.py
+    """
+
+    BASEPT_AND_DIR_VECTORS_MUST_BE_IN_SAME_DIM = (
+        'The basepoint and direction vectors should all live in the same '
+        'dimension')
+
+    def __init__(self, basepoint, direction_vectors):
+
+        self.basepoint = basepoint
+        self.direction_vectors = direction_vectors
+        self.dimension = self.basepoint.dimension
+
+        try:
+            for v in direction_vectors:
+                assert v.dimension == self.dimension
+
+        except AssertionError:
+            raise Exception(self.BASEPT_AND_DIR_VECTORS_MUST_BE_IN_SAME_DIM)
+
+    def __str__(self):
+
+        output = ''
+        for coord in range(self.dimension):
+            output += 'x_{} = {} '.format(coord + 1,
+                                          round(self.basepoint[coord], 3))
+            for free_var, vector in enumerate(self.direction_vectors):
+                output += '+ {} t_{}'.format(round(vector[coord], 3),
+                                             free_var + 1)
+            output += '\n'
+        return output
 
 
 class MyDecimal(Decimal):
