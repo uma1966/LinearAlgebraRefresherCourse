@@ -6,7 +6,7 @@ from decimal import Decimal, getcontext
 from copy import deepcopy
 
 from vector import Vector
-from plane import Plane
+from hyperplane import Hyperplane as Plane
 
 
 getcontext().prec = 30
@@ -37,15 +37,17 @@ class LinearSystem(object):
         plane = self[row]
         new_normal_vector = plane.normal_vector.scalar_product(coefficient)
         new_constant_term = plane.constant_term * coefficient
-        self[row] = Plane(new_normal_vector, new_constant_term)
+        self[row] = Plane(normal_vector=new_normal_vector,
+                          constant_term=new_constant_term)
 
     def add_multiple_times_row_to_row(self, coefficient, row_to_add, row_to_be_added_to):
         plane = self[row_to_add]
-        plane_to_add = Plane(plane.normal_vector.scalar_product(coefficient), plane.constant_term*coefficient)
+        plane_to_add = Plane(normal_vector=plane.normal_vector.scalar_product(coefficient),
+                             constant_term=plane.constant_term*coefficient)
         plane = self[row_to_be_added_to]
         self[row_to_be_added_to] = Plane(
-            plane.normal_vector.add(plane_to_add.normal_vector),
-            plane.constant_term + plane_to_add.constant_term)
+            normal_vector=plane.normal_vector.add(plane_to_add.normal_vector),
+            constant_term=plane.constant_term + plane_to_add.constant_term)
 
     def indices_of_first_nonzero_terms_in_each_row(self):
         num_equations = len(self)

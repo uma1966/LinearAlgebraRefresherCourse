@@ -3,7 +3,7 @@ Uwe Maurer 2017
 """
 
 from linsys import LinearSystem
-from plane import Plane
+from hyperplane import Hyperplane as Plane
 from vector import Vector
 from decimal import Decimal
 
@@ -88,7 +88,7 @@ p2 = Plane(normal_vector=Vector(['1','1','1']), constant_term='2')
 s = LinearSystem([p1,p2])
 t = s.compute_triangular_form()
 if not (t[0] == p1 and
-        t[1] == Plane(constant_term='1')):
+        t[1] == Plane(dimension=3, constant_term='1')):
     print('test case 20.2 failed')
 
 p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
@@ -100,7 +100,7 @@ t = s.compute_triangular_form()
 if not (t[0] == p1 and
         t[1] == p2 and
         t[2] == Plane(normal_vector=Vector(['0','0','-2']), constant_term='2') and
-        t[3] == Plane()):
+        t[3] == Plane(dimension=3)):
     print('test case 20.3 failed')
 
 p1 = Plane(normal_vector=Vector(['0','1','1']), constant_term='1')
@@ -132,7 +132,7 @@ p2 = Plane(normal_vector=Vector(['1','1','1']), constant_term='2')
 s = LinearSystem([p1,p2])
 r = s.compute_rref()
 if not (r[0] == p1 and
-        r[1] == Plane(constant_term='1')):
+        r[1] == Plane(dimension=3,constant_term='1')):
     print('test case 21.2 failed')
 
 p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
@@ -144,7 +144,7 @@ r = s.compute_rref()
 if not (r[0] == Plane(normal_vector=Vector(['1','0','0']), constant_term='0') and
         r[1] == p2 and
         r[2] == Plane(normal_vector=Vector(['0','0','-2']), constant_term='2') and
-        r[3] == Plane()):
+        r[3] == Plane(dimension=3)):
     print('test case 21.3 failed')
 
 p1 = Plane(normal_vector=Vector(['0','1','1']), constant_term='1')
@@ -190,23 +190,37 @@ print('\nQuiz 23')
 
 # Note that in the video the second vector is written as:
 # Vector([-0.138, -0.138, 0.244]), but bellow is the right implementation
-p1 = Plane(Vector(['0.786', '0.786', '0.588']), '-0.714')
-p2 = Plane(Vector(['-0.131', '-0.131', '0.244']), '0.319')
+p1 = Plane(normal_vector=Vector(['0.786', '0.786', '0.588']), constant_term='-0.714')
+p2 = Plane(normal_vector=Vector(['-0.131', '-0.131', '0.244']), constant_term='0.319')
 s = LinearSystem([p1,p2])
 result = s.solve()
 print('Solution:\n', result)
 
-p1 = Plane(Vector(['8.631', '5.112', '-1.816']), '-5.113')
-p2 = Plane(Vector(['4.315', '11.132', '-5.27']), '-6.775')
-p3 = Plane(Vector(['-2.158', '3.01', '-1.727']), '-0.831')
+p1 = Plane(normal_vector=Vector(['8.631', '5.112', '-1.816']), constant_term='-5.113')
+p2 = Plane(normal_vector=Vector(['4.315', '11.132', '-5.27']), constant_term='-6.775')
+p3 = Plane(normal_vector=Vector(['-2.158', '3.01', '-1.727']), constant_term='-0.831')
 s = LinearSystem([p1,p2,p3])
 result = s.solve()
 print('Solution:\n', result)
 
-p1 = Plane(Vector(['0.935', '1.76', '-9.365']), '-9.955')
-p2 = Plane(Vector(['0.187', '0.352', '-1.873']), '-1.991')
-p3 = Plane(Vector(['0.374', '0.704', '-3.746']), '-3.982')
-p4 = Plane(Vector(['-0.561', '-1.056', '5.619']), '5.973')
+p1 = Plane(normal_vector=Vector(['0.935', '1.76', '-9.365']), constant_term='-9.955')
+p2 = Plane(normal_vector=Vector(['0.187', '0.352', '-1.873']), constant_term='-1.991')
+p3 = Plane(normal_vector=Vector(['0.374', '0.704', '-3.746']), constant_term='-3.982')
+p4 = Plane(normal_vector=Vector(['-0.561', '-1.056', '5.619']), constant_term='5.973')
 s = LinearSystem([p1,p2,p3,p4])
 result = s.solve()
 print('Solution:\n', result)
+
+#
+# Extending to higher dimensions
+#
+print('\nExtending to higher dimensions:')
+
+p1 = Plane(normal_vector=Vector(['0.786', '0.786']), constant_term='-0.714')
+p2 = Plane(normal_vector=Vector(['-0.131', '-0.131']), constant_term='0.319')
+s = LinearSystem([p1,p2])
+result = s.solve()
+print('Solution:\n', result)
+
+# Other examples skipped...
+
