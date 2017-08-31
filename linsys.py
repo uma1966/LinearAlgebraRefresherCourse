@@ -8,6 +8,7 @@ from copy import deepcopy
 from vector import Vector
 from plane import Plane
 
+
 getcontext().prec = 30
 
 
