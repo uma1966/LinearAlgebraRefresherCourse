@@ -6,6 +6,9 @@ from decimal import Decimal, getcontext
 from copy import deepcopy
 
 from vector import Vector
+# 3 dimensions:
+# from plane import Plane
+# more than 3 dimensions:
 from hyperplane import Hyperplane as Plane
 
 
